@@ -2,28 +2,429 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Enlaces a Index</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary-color: #6366f1;
+      --primary-hover: #4f46e5;
+      --secondary-color: #f8fafc;
+      --text-primary: #1e293b;
+      --text-secondary: #64748b;
+      --border-color: #e2e8f0;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+      --gradient-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      line-height: 1.6;
+      color: var(--text-primary);
+      background: var(--gradient-bg);
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+      animation: slideUp 0.8s ease-out;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .header {
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+      color: white;
+      padding: 3rem 2rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      animation: rotate 20s linear infinite;
+    }
+
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .header p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      position: relative;
+      z-index: 1;
+    }
+
+    .content {
+      padding: 2rem;
+    }
+
+    .search-box {
+      margin-bottom: 2rem;
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 1rem 1rem 1rem 3rem;
+      border: 2px solid var(--border-color);
+      border-radius: 12px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      background: var(--secondary-color);
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      background: white;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-secondary);
+      font-size: 1.2rem;
+    }
+
+    .links-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+      list-style: none;
+    }
+
+    .link-card {
+      background: white;
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 1.5rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .link-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--gradient-bg);
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+    }
+
+    .link-card:hover {
+      transform: translateY(-8px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--primary-color);
+    }
+
+    .link-card:hover::before {
+      transform: scaleX(1);
+    }
+
+    .link-card a {
+      text-decoration: none;
+      color: var(--text-primary);
+      display: block;
+      position: relative;
+    }
+
+    .link-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .link-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--gradient-bg);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+
+    .link-description {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-secondary);
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid var(--border-color);
+      border-top: 4px solid var(--primary-color);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .error {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #dc2626;
+      padding: 1rem;
+      border-radius: 12px;
+      margin: 1rem 0;
+      text-align: center;
+    }
+
+    .no-results {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-secondary);
+    }
+
+    .no-results-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 1rem 0.5rem;
+      }
+
+      .header {
+        padding: 2rem 1rem;
+      }
+
+      .header h1 {
+        font-size: 2rem;
+      }
+
+      .content {
+        padding: 1.5rem;
+      }
+
+      .links-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+
+      .link-card {
+        padding: 1.25rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .header h1 {
+        font-size: 1.75rem;
+      }
+
+      .header p {
+        font-size: 1rem;
+      }
+
+      .content {
+        padding: 1rem;
+      }
+    }
+  </style>
 </head>
 <body>
-  <h1>Carpetas con index.html</h1>
-  <ul id="lista-enlaces"></ul>
+  <div class="container">
+    <header class="header">
+      <h1>📁 Explorador de Directorios</h1>
+      <p>Accede rápidamente a todos tus proyectos</p>
+    </header>
+    
+    <div class="content">
+      <div class="search-box">
+        <div class="search-icon">🔍</div>
+        <input 
+          type="text" 
+          class="search-input" 
+          placeholder="Buscar directorio..." 
+          id="busqueda"
+        >
+      </div>
+      
+      <div id="loading" class="loading">
+        <div class="spinner"></div>
+        <p>Cargando directorios...</p>
+      </div>
+      
+      <div id="error" class="error" style="display: none;"></div>
+      
+      <ul id="lista-enlaces" class="links-grid" style="display: none;"></ul>
+      
+      <div id="no-results" class="no-results" style="display: none;">
+        <div class="no-results-icon">🔍</div>
+        <h3>No se encontraron resultados</h3>
+        <p>Intenta con otro término de búsqueda</p>
+      </div>
+    </div>
+  </div>
 
   <script>
+    let directorios = [];
+    let directoriosFiltrados = [];
+
+    // Función para obtener las iniciales del nombre
+    function obtenerIniciales(nombre) {
+      return nombre.split(/[\s-_]+/).map(word => word.charAt(0).toUpperCase()).slice(0, 2).join('');
+    }
+
+    // Función para crear tarjeta de enlace
+    function crearTarjetaEnlace(item) {
+      const li = document.createElement('li');
+      li.className = 'link-card';
+      
+      const iniciales = obtenerIniciales(item.nombre);
+      
+      li.innerHTML = `
+        <a href="${item.enlace}" target="_blank">
+          <div class="link-title">
+            <div class="link-icon">${iniciales}</div>
+            <span>${item.nombre}</span>
+          </div>
+          <div class="link-description">
+            Explorar contenido del directorio
+          </div>
+        </a>
+      `;
+
+      // Animación de entrada
+      li.style.opacity = '0';
+      li.style.transform = 'translateY(20px)';
+      
+      return li;
+    }
+
+    // Función para mostrar directorios
+    function mostrarDirectorios(datos) {
+      const lista = document.getElementById('lista-enlaces');
+      lista.innerHTML = '';
+      
+      if (datos.length === 0) {
+        document.getElementById('no-results').style.display = 'block';
+        lista.style.display = 'none';
+        return;
+      }
+      
+      document.getElementById('no-results').style.display = 'none';
+      lista.style.display = 'grid';
+      
+      datos.forEach((item, index) => {
+        const tarjeta = crearTarjetaEnlace(item);
+        lista.appendChild(tarjeta);
+        
+        // Animación escalonada
+        setTimeout(() => {
+          tarjeta.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+          tarjeta.style.opacity = '1';
+          tarjeta.style.transform = 'translateY(0)';
+        }, index * 100);
+      });
+    }
+
+    // Función de búsqueda
+    function filtrarDirectorios(termino) {
+      if (!termino.trim()) {
+        directoriosFiltrados = [...directorios];
+      } else {
+        directoriosFiltrados = directorios.filter(item => 
+          item.nombre.toLowerCase().includes(termino.toLowerCase())
+        );
+      }
+      mostrarDirectorios(directoriosFiltrados);
+    }
+
+    // Event listener para búsqueda
+    document.getElementById('busqueda').addEventListener('input', (e) => {
+      filtrarDirectorios(e.target.value);
+    });
+
+    // Cargar datos
     fetch('/api/directorios')
-      .then(res => res.json())
-      .then(data => {
-        const lista = document.getElementById('lista-enlaces');
-        data.forEach(item => {
-          const li = document.createElement('li');
-          const a = document.createElement('a');
-          a.href = item.enlace;
-          a.textContent = item.nombre;
-          a.target = '_blank';
-          li.appendChild(a);
-          lista.appendChild(li);
-        });
+      .then(res => {
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        return res.json();
       })
-      .catch(err => console.error('Error cargando enlaces:', err));
+      .then(data => {
+        directorios = data;
+        directoriosFiltrados = [...data];
+        
+        document.getElementById('loading').style.display = 'none';
+        mostrarDirectorios(directoriosFiltrados);
+      })
+      .catch(err => {
+        console.error('Error cargando enlaces:', err);
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('error').style.display = 'block';
+        document.getElementById('error').textContent = 
+          'Error al cargar los directorios. Por favor, intenta nuevamente.';
+      });
   </script>
 </body>
 </html>
