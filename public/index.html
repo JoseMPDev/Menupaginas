@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Enlaces a Index</title>
+</head>
+<body>
+  <h1>Carpetas con index.html</h1>
+  <ul id="lista-enlaces"></ul>
+
+  <script>
+    fetch('/api/directorios')
+      .then(res => res.json())
+      .then(data => {
+        const lista = document.getElementById('lista-enlaces');
+        data.forEach(item => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+          a.href = item.enlace;
+          a.textContent = item.nombre;
+          a.target = '_blank';
+          li.appendChild(a);
+          lista.appendChild(li);
+        });
+      })
+      .catch(err => console.error('Error cargando enlaces:', err));
+  </script>
+</body>
+</html>
