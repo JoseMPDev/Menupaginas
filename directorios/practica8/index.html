@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Registro de Ventas Mensuales</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #4361ee;
+      --secondary-color: #3f37c9;
+      --accent-color: #4cc9f0;
+      --light-color: #f8f9fa;
+      --dark-color: #212529;
+      --transition: all 0.3s ease;
+    }
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    
+    .app-container {
+      max-width: 900px;
+      width: 100%;
+      background: white;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    .app-header {
+      background: var(--primary-color);
+      color: white;
+      padding: 25px;
+      text-align: center;
+      position: relative;
+    }
+    
+    .app-header h1 {
+      font-weight: 700;
+      margin: 0;
+      font-size: 1.8rem;
+    }
+    
+    .app-body {
+      padding: 30px;
+    }
+    
+    .form-card {
+      background: var(--light-color);
+      border-radius: 15px;
+      padding: 25px;
+      margin-bottom: 30px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+    
+    .form-floating {
+      margin-bottom: 15px;
+    }
+    
+    .btn-primary {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+      border-radius: 10px;
+      padding: 10px 25px;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+    
+    .btn-primary:hover {
+      background-color: var(--secondary-color);
+      border-color: var(--secondary-color);
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+    }
+    
+    .chart-container {
+      position: relative;
+      height: 350px;
+      margin-top: 20px;
+      border-radius: 15px;
+      padding: 20px;
+      background: var(--light-color);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+    
+    .no-data-message {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #adb5bd;
+      font-weight: 500;
+      text-align: center;
+    }
+    
+    .no-data-message i {
+      font-size: 3rem;
+      margin-bottom: 10px;
+      display: block;
+    }
+    
+    .hidden {
+      display: none;
+    }
+    
+    .data-table {
+      margin-top: 30px;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+    
+    .data-table thead {
+      background-color: var(--primary-color);
+      color: white;
+    }
+    
+    .data-table th, .data-table td {
+      text-align: center;
+    }
+    
+    /* Animaciones */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .fadeIn {
+      animation: fadeIn 0.5s ease forwards;
+    }
+    
+    /* Media queries para responsividad */
+    @media (max-width: 768px) {
+      .app-header h1 {
+        font-size: 1.5rem;
+      }
+      
+      .app-body {
+        padding: 20px;
+      }
+      
+      .form-card {
+        padding: 20px;
+      }
+      
+      .chart-container {
+        height: 300px;
+      }
+    }
+    
+    @media (max-width: 576px) {
+      .app-header h1 {
+        font-size: 1.3rem;
+      }
+      
+      .form-group {
+        margin-bottom: 10px;
+      }
+      
+      .chart-container {
+        height: 250px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <div class="app-header">
+      <h1><i class="fas fa-chart-line me-2"></i>Registro de Ventas Mensuales</h1>
+    </div>
+    
+    <div class="app-body">
+      <div class="form-card">
+        <form id="salesForm">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="form-floating">
+                <input type="text" class="form-control" id="month" placeholder="Mes" required>
+                <label for="month">Mes (ej. Enero)</label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-floating">
+                <input type="number" class="form-control" id="amount" placeholder="Monto" min="0" step="0.01" required>
+                <label for="amount">Monto de ventas</label>
+              </div>
+            </div>
+          </div>
+          <div class="mt-3 d-grid d-md-flex justify-content-md-end">
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-plus me-2"></i>Agregar
+            </button>
+          </div>
+        </form>
+      </div>
+      
+      <div class="chart-container">
+        <div id="noDataMessage" class="no-data-message">
+          <i class="fas fa-chart-bar"></i>
+          <p>Ingresa datos de ventas para visualizar el gráfico</p>
+        </div>
+        <canvas id="salesChart" class="hidden"></canvas>
+      </div>
+      
+      <div class="data-table hidden" id="dataTableContainer">
+        <table class="table table-striped table-hover mb-0">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Mes</th>
+              <th scope="col">Monto</th>
+              <th scope="col">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="salesTableBody">
+            <!-- Los datos de ventas se agregarán aquí dinámicamente -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      // Arreglo donde se almacenan los datos ingresados por el usuario
+      const salesData = [];
+      
+      // Referencias a elementos del DOM
+      const form = document.getElementById('salesForm');
+      const noDataMessage = document.getElementById('noDataMessage');
+      const salesChart = document.getElementById('salesChart');
+      const dataTableContainer = document.getElementById('dataTableContainer');
+      const salesTableBody = document.getElementById('salesTableBody');
+      
+      // Configuración del gráfico
+      const ctx = salesChart.getContext('2d');
+      let chart;
+      
+      // Función para inicializar el gráfico
+      function initChart() {
+        chart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: [],
+            datasets: [{
+              label: 'Ventas por mes',
+              data: [],
+              backgroundColor: getGradientColor(),
+              borderColor: '#4361ee',
+              borderWidth: 1,
+              borderRadius: 5,
+              maxBarThickness: 50
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'top',
+              },
+              tooltip: {
+                backgroundColor: 'rgba(33, 37, 41, 0.8)',
+                titleFont: {
+                  size: 14,
+                  weight: 'bold'
+                },
+                bodyFont: {
+                  size: 14
+                },
+                padding: 10,
+                cornerRadius: 6,
+                displayColors: false,
+                callbacks: {
+                  label: function(context) {
+                    return `Ventas: $${context.raw.toLocaleString()}`;
+                  }
+                }
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                grid: {
+                  drawBorder: false,
+                  color: 'rgba(0, 0, 0, 0.05)'
+                },
+                ticks: {
+                  callback: function(value) {
+                    return '$' + value.toLocaleString();
+                  }
+                }
+              },
+              x: {
+                grid: {
+                  display: false
+                }
+              }
+            },
+            animation: {
+              duration: 1000,
+              easing: 'easeOutQuart'
+            }
+          }
+        });
+      }
+      
+      // Función para crear un degradado para las barras del gráfico
+      function getGradientColor() {
+        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, 'rgba(67, 97, 238, 0.8)');
+        gradient.addColorStop(1, 'rgba(76, 201, 240, 0.3)');
+        return gradient;
+      }
+      
+      // Función para actualizar la tabla de datos
+      function updateTable() {
+        salesTableBody.innerHTML = '';
+        salesData.forEach((item, index) => {
+          const row = document.createElement('tr');
+          row.classList.add('fadeIn');
+          
+          row.innerHTML = `
+            <td>${index + 1}</td>
+            <td>${item.month}</td>
+            <td>$${parseFloat(item.amount).toLocaleString()}</td>
+            <td>
+              <button class="btn btn-sm btn-danger delete-btn" data-index="${index}">
+                <i class="fas fa-trash"></i>
+              </button>
+            </td>
+          `;
+          
+          salesTableBody.appendChild(row);
+        });
+        
+        // Agregar event listeners a los botones de eliminar
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+          btn.addEventListener('click', function() {
+            const index = parseInt(this.getAttribute('data-index'));
+            removeDataPoint(index);
+          });
+        });
+      }
+      
+      // Función para eliminar un punto de datos
+      function removeDataPoint(index) {
+        salesData.splice(index, 1);
+        
+        // Actualizar el gráfico
+        chart.data.labels = salesData.map(item => item.month);
+        chart.data.datasets[0].data = salesData.map(item => item.amount);
+        chart.update();
+        
+        // Actualizar la tabla
+        updateTable();
+        
+        // Mostrar/ocultar elementos según si hay datos
+        toggleDataVisibility();
+      }
+      
+      // Función para mostrar u ocultar elementos según si hay datos
+      function toggleDataVisibility() {
+        if (salesData.length === 0) {
+          noDataMessage.classList.remove('hidden');
+          salesChart.classList.add('hidden');
+          dataTableContainer.classList.add('hidden');
+        } else {
+          noDataMessage.classList.add('hidden');
+          salesChart.classList.remove('hidden');
+          dataTableContainer.classList.remove('hidden');
+        }
+      }
+      
+      // Inicializar el gráfico al cargar la página
+      initChart();
+      
+      // Manejar el envío del formulario
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Obtener valores del formulario
+        const month = document.getElementById('month').value.trim();
+        const amount = parseFloat(document.getElementById('amount').value);
+        
+        // Validar datos
+        if (!month || isNaN(amount)) return;
+        
+        // Añadir datos al array
+        salesData.push({ month, amount });
+        
+        // Si es el primer dato, mostrar el gráfico
+        if (salesData.length === 1) {
+          toggleDataVisibility();
+        }
+        
+        // Actualizar el gráfico
+        chart.data.labels.push(month);
+        chart.data.datasets[0].data.push(amount);
+        chart.update();
+        
+        // Actualizar la tabla
+        updateTable();
+        
+        // Resetear el formulario
+        form.reset();
+        document.getElementById('month').focus();
+      });
+    });
+  </script>
+</body>
+</html>

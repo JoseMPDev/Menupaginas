@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro Médico de Pacientes</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2c6eb5;
+            --primary-light: #e8f1ff;
+            --secondary: #37b7c4;
+            --text: #333333;
+            --light-gray: #f5f7fa;
+            --gray: #e1e5eb;
+            --white: #ffffff;
+            --success: #4caf50;
+            --warning: #ff9800;
+            --danger: #f44336;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light-gray);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: var(--primary);
+            color: var(--white);
+            padding: 20px 0;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        header .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .logo i {
+            font-size: 28px;
+        }
+        
+        .progress-container {
+            margin-bottom: 30px;
+            padding: 0 10px;
+        }
+        
+        .progress-bar {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin-bottom: 30px;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .progress-bar::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+            height: 4px;
+            width: 100%;
+            background-color: var(--gray);
+            z-index: 1;
+        }
+        
+        .progress {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+            height: 4px;
+            background-color: var(--primary);
+            z-index: 2;
+            transition: width 0.3s ease;
+        }
+        
+        .step {
+            width: 30px;
+            height: 30px;
+            background-color: var(--white);
+            border: 2px solid var(--gray);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            position: relative;
+            z-index: 3;
+            transition: all 0.3s ease;
+        }
+        
+        .step.active {
+            border-color: var(--primary);
+            background-color: var(--primary-light);
+            color: var(--primary);
+        }
+        
+        .step.completed {
+            border-color: var(--primary);
+            background-color: var(--primary);
+            color: var(--white);
+        }
+        
+        .step-label {
+            position: absolute;
+            top: 35px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            white-space: nowrap;
+            color: var(--text);
+            font-weight: 500;
+        }
+        
+        .card {
+            background-color: var(--white);
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+        
+        h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-weight: 600;
+            font-size: 22px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--gray);
+            border-radius: 4px;
+            font-size: 16px;
+            transition: border 0.3s ease;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(44, 110, 181, 0.1);
+        }
+        
+        .btn-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+        
+        .btn-primary:hover {
+            background-color: #1e5c9a;
+        }
+        
+        .btn-secondary {
+            background-color: var(--light-gray);
+            color: var(--text);
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--gray);
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+            color: var(--white);
+        }
+        
+        .btn-success:hover {
+            background-color: #3d8b40;
+        }
+        
+        .btn-warning {
+            background-color: var(--warning);
+            color: var(--white);
+        }
+        
+        .btn-warning:hover {
+            background-color: #e68900;
+        }
+        
+        .btn i {
+            margin-right: 8px;
+        }
+        
+        .page {
+            display: none;
+        }
+        
+        .active {
+            display: block;
+        }
+        
+        .summary-content {
+            background-color: var(--light-gray);
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .summary-section {
+            margin-bottom: 20px;
+        }
+
+        .summary-section h3 {
+            font-size: 18px;
+            color: var(--primary);
+            margin-bottom: 10px;
+            border-bottom: 1px solid var(--gray);
+            padding-bottom: 5px;
+        }
+
+        .summary-data {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .summary-item {
+            margin-bottom: 5px;
+        }
+
+        .summary-item strong {
+            color: var(--text);
+        }
+
+        .add-button {
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 12px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .add-button i {
+            margin-right: 5px;
+        }
+
+        .add-button:hover {
+            background-color: #2da8b4;
+        }
+
+        .family-entry, .condition-entry, .hospitalization-entry {
+            background-color: var(--primary-light);
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+        
+        .remove-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .btn {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+            
+            .logo {
+                font-size: 20px;
+            }
+            
+            .logo i {
+                font-size: 24px;
+            }
+            
+            .step-label {
+                display: none;
+            }
+            
+            .summary-data {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px 0;
+            color: #888;
+            font-size: 14px;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-hospital"></i>
+                <span>Clínica Salud Integral</span>
+            </div>
+            <div>
+                <span>Registro de Pacientes</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress" id="progressBar"></div>
+                <div class="step active" data-step="1">1<span class="step-label">Datos Personales</span></div>
+                <div class="step" data-step="2">2<span class="step-label">Familiares</span></div>
+                <div class="step" data-step="3">3<span class="step-label">Condiciones</span></div>
+                <div class="step" data-step="4">4<span class="step-label">Internamientos</span></div>
+                <div class="step" data-step="5">5<span class="step-label">Resumen</span></div>
+            </div>
+        </div>
+
+        <form id="multiPageForm">
+            <!-- Página 1: Datos Personales -->
+            <div class="page active" id="page1">
+                <div class="card">
+                    <h2><i class="fas fa-user-circle"></i> Datos Personales</h2>
+                    <div class="form-group">
+                        <label for="nombre">Nombre</label>
+                        <input type="text" id="nombre" placeholder="Ingrese su nombre">
+                    </div>
+                    <div class="form-group">
+                        <label for="apellido">Apellido</label>
+                        <input type="text" id="apellido" placeholder="Ingrese su apellido">
+                    </div>
+                    <div class="form-group">
+                        <label for="fechaNacimiento">Fecha de Nacimiento</label>
+                        <input type="date" id="fechaNacimiento">
+                    </div>
+                    <div class="form-group">
+                        <label for="genero">Género</label>
+                        <select id="genero">
+                            <option value="">Seleccione una opción</option>
+                            <option value="masculino">Masculino</option>
+                            <option value="femenino">Femenino</option>
+                            <option value="otro">Otro</option>
+                        </select>
+                    </div>
+                    <div class="btn-container">
+                        <div></div> <!-- Div vacío para mantener el espaciado -->
+                        <button type="button" class="btn btn-primary" onclick="goToPage(2)">
+                            <i class="fas fa-arrow-right"></i> Siguiente
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Página 2: Familiares -->
+            <div class="page" id="page2">
+                <div class="card">
+                    <h2><i class="fas fa-users"></i> Información Familiar</h2>
+                    <div id="familiaresContainer">
+                        <div class="family-entry">
+                            <div class="form-group">
+                                <label for="nombreFamiliar">Nombre del Familiar</label>
+                                <input type="text" id="nombreFamiliar" placeholder="Nombre completo">
+                            </div>
+                            <div class="form-group">
+                                <label for="parentesco">Parentesco</label>
+                                <select id="parentesco">
+                                    <option value="">Seleccione una opción</option>
+                                    <option value="padre">Padre</option>
+                                    <option value="madre">Madre</option>
+                                    <option value="hijo">Hijo/a</option>
+                                    <option value="hermano">Hermano/a</option>
+                                    <option value="conyuge">Cónyuge</option>
+                                    <option value="otro">Otro</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="edadFamiliar">Edad</label>
+                                <input type="number" id="edadFamiliar" placeholder="Edad">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="button" class="add-button" onclick="addFamiliar()">
+                        <i class="fas fa-plus"></i> Agregar otro familiar
+                    </button>
+                    
+                    <div class="btn-container">
+                        <button type="button" class="btn btn-secondary" onclick="goToPage(1)">
+                            <i class="fas fa-arrow-left"></i> Anterior
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="goToPage(3)">
+                            <i class="fas fa-arrow-right"></i> Siguiente
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Página 3: Condiciones Preexistentes -->
+            <div class="page" id="page3">
+                <div class="card">
+                    <h2><i class="fas fa-notes-medical"></i> Condiciones Médicas</h2>
+                    <div id="condicionesContainer">
+                        <div class="condition-entry">
+                            <div class="form-group">
+                                <label for="enfermedad">Enfermedad o Condición</label>
+                                <input type="text" id="enfermedad" placeholder="Nombre de la condición médica">
+                            </div>
+                            <div class="form-group">
+                                <label for="tiempo">Tiempo con la condición (años)</label>
+                                <input type="number" id="tiempo" placeholder="Años">
+                            </div>
+                            <div class="form-group">
+                                <label for="medicacion">Medicación Actual</label>
+                                <input type="text" id="medicacion" placeholder="Medicamentos que toma actualmente">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="button" class="add-button" onclick="addCondicion()">
+                        <i class="fas fa-plus"></i> Agregar otra condición
+                    </button>
+                    
+                    <div class="btn-container">
+                        <button type="button" class="btn btn-secondary" onclick="goToPage(2)">
+                            <i class="fas fa-arrow-left"></i> Anterior
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="goToPage(4)">
+                            <i class="fas fa-arrow-right"></i> Siguiente
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Página 4: Internamientos -->
+            <div class="page" id="page4">
+                <div class="card">
+                    <h2><i class="fas fa-procedures"></i> Internamientos Previos</h2>
+                    <div id="internamientosContainer">
+                        <div class="hospitalization-entry">
+                            <div class="form-group">
+                                <label for="fechaInternamiento">Fecha de Internamiento</label>
+                                <input type="date" id="fechaInternamiento">
+                            </div>
+                            <div class="form-group">
+                                <label for="centroMedico">Centro Médico</label>
+                                <input type="text" id="centroMedico" placeholder="Nombre del hospital o clínica">
+                            </div>
+                            <div class="form-group">
+                                <label for="diagnostico">Diagnóstico</label>
+                                <input type="text" id="diagnostico" placeholder="Diagnóstico recibido">
+                            </div>
+                            <div class="form-group">
+                                <label for="duracion">Duración (días)</label>
+                                <input type="number" id="duracion" placeholder="Número de días">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="button" class="add-button" onclick="addInternamiento()">
+                        <i class="fas fa-plus"></i> Agregar otro internamiento
+                    </button>
+                    
+                    <div class="btn-container">
+                        <button type="button" class="btn btn-secondary" onclick="goToPage(3)">
+                            <i class="fas fa-arrow-left"></i> Anterior
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="goToPage(5)">
+                            <i class="fas fa-arrow-right"></i> Siguiente
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Página 5: Resumen -->
+            <div class="page" id="page5">
+                <div class="card">
+                    <h2><i class="fas fa-clipboard-check"></i> Resumen de la Información</h2>
+                    <div id="summaryContainer" class="summary-content"></div>
+                    <div class="btn-container">
+                        <button type="button" class="btn btn-secondary" onclick="goToPage(4)">
+                            <i class="fas fa-arrow-left"></i> Anterior
+                        </button>
+                        <button type="button" class="btn btn-success" onclick="submitForm()">
+                            <i class="fas fa-save"></i> Guardar Registro
+                        </button>
+                        <button type="button" class="btn btn-warning" onclick="newPatient()">
+                            <i class="fas fa-user-plus"></i> Nuevo Paciente
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Clínica Salud Integral. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Variables globales
+        let currentPage = 1;
+        const totalPages = 5;
+        let familiares = [];
+        let condiciones = [];
+        let internamientos = [];
+
+        // Inicializar con el primer familiar, condición e internamiento
+        familiares.push({
+            nombreFamiliar: '',
+            parentesco: '',
+            edadFamiliar: ''
+        });
+        
+        condiciones.push({
+            enfermedad: '',
+            tiempo: '',
+            medicacion: ''
+        });
+        
+        internamientos.push({
+            fechaInternamiento: '',
+            centroMedico: '',
+            diagnostico: '',
+            duracion: ''
+        });
+
+        // Inicializar la barra de progreso cuando el documento está cargado
+        document.addEventListener('DOMContentLoaded', function() {
+            updateProgressBar();
+        });
+
+        // Función para navegar entre páginas - Definida de manera global en el documento
+        function goToPage(page) {
+            // Guardar los datos de la página actual
+            saveCurrentPageData();
+            
+            // Ocultar página actual y mostrar la siguiente
+            document.getElementById(`page${currentPage}`).classList.remove('active');
+            currentPage = page;
+            document.getElementById(`page${currentPage}`).classList.add('active');
+            
+            // Si es la página final, generar el resumen
+            if (currentPage === 5) {
+                generateSummary();
+            }
+            
+            updateProgressBar();
+            window.scrollTo(0, 0);
+        }
+
+        function updateProgressBar() {
+            const percent = ((currentPage - 1) / (totalPages - 1)) * 100;
+            document.getElementById('progressBar').style.width = percent + '%';
+            
+            // Actualizar los pasos
+            document.querySelectorAll('.step').forEach(step => {
+                const stepNum = parseInt(step.getAttribute('data-step'));
+                step.classList.remove('active', 'completed');
+                
+                if (stepNum < currentPage) {
+                    step.classList.add('completed');
+                } else if (stepNum === currentPage) {
+                    step.classList.add('active');
+                }
+            });
+        }
+
+        function saveCurrentPageData() {
+            if (currentPage === 1) {
+                // Guardar datos personales - se recuperan directamente en el resumen
+            } else if (currentPage === 2) {
+                // Guardar datos de familiares
+                familiares = [];
+                document.querySelectorAll('.family-entry').forEach((entry, index) => {
+                    const nombreInput = entry.querySelector('[id^="nombreFamiliar"]');
+                    const parentescoInput = entry.querySelector('[id^="parentesco"]');
+                    const edadInput = entry.querySelector('[id^="edadFamiliar"]');
+                    
+                    if (nombreInput && parentescoInput && edadInput) {
+                        familiares.push({
+                            nombreFamiliar: nombreInput.value,
+                            parentesco: parentescoInput.value,
+                            edadFamiliar: edadInput.value
+                        });
+                    }
+                });
+            } else if (currentPage === 3) {
+                // Guardar condiciones médicas
+                condiciones = [];
+                document.querySelectorAll('.condition-entry').forEach((entry, index) => {
+                    const enfermedadInput = entry.querySelector('[id^="enfermedad"]');
+                    const tiempoInput = entry.querySelector('[id^="tiempo"]');
+                    const medicacionInput = entry.querySelector('[id^="medicacion"]');
+                    
+                    if (enfermedadInput && tiempoInput && medicacionInput) {
+                        condiciones.push({
+                            enfermedad: enfermedadInput.value,
+                            tiempo: tiempoInput.value,
+                            medicacion: medicacionInput.value
+                        });
+                    }
+                });
+            } else if (currentPage === 4) {
+                // Guardar internamientos
+                internamientos = [];
+                document.querySelectorAll('.hospitalization-entry').forEach((entry, index) => {
+                    const fechaInput = entry.querySelector('[id^="fechaInternamiento"]');
+                    const centroInput = entry.querySelector('[id^="centroMedico"]');
+                    const diagnosticoInput = entry.querySelector('[id^="diagnostico"]');
+                    const duracionInput = entry.querySelector('[id^="duracion"]');
+                    
+                    if (fechaInput && centroInput && diagnosticoInput && duracionInput) {
+                        internamientos.push({
+                            fechaInternamiento: fechaInput.value,
+                            centroMedico: centroInput.value,
+                            diagnostico: diagnosticoInput.value,
+                            duracion: duracionInput.value
+                        });
+                    }
+                });
+            }
+        }
+
+        function addFamiliar() {
+            const container = document.getElementById('familiaresContainer');
+            const newIndex = document.querySelectorAll('.family-entry').length;
+            
+            const newEntry = document.createElement('div');
+            newEntry.className = 'family-entry';
+            newEntry.innerHTML = `
+                <button type="button" class="remove-btn" onclick="removeFamiliar(this)"><i class="fas fa-times"></i></button>
+                <div class="form-group">
+                    <label for="nombreFamiliar${newIndex}">Nombre del Familiar</label>
+                    <input type="text" id="nombreFamiliar${newIndex}" placeholder="Nombre completo">
+                </div>
+                <div class="form-group">
+                    <label for="parentesco${newIndex}">Parentesco</label>
+                    <select id="parentesco${newIndex}">
+                        <option value="">Seleccione una opción</option>
+                        <option value="padre">Padre</option>
+                        <option value="madre">Madre</option>
+                        <option value="hijo">Hijo/a</option>
+                        <option value="hermano">Hermano/a</option>
+                        <option value="conyuge">Cónyuge</option>
+                        <option value="otro">Otro</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edadFamiliar${newIndex}">Edad</label>
+                    <input type="number" id="edadFamiliar${newIndex}" placeholder="Edad">
+                </div>
+            `;
+            
+            container.appendChild(newEntry);
+        }
+
+        function removeFamiliar(button) {
+            const entry = button.parentNode;
+            const container = entry.parentNode;
+            container.removeChild(entry);
+        }
+
+        function addCondicion() {
+            const container = document.getElementById('condicionesContainer');
+            const newIndex = document.querySelectorAll('.condition-entry').length;
+            
+            const newEntry = document.createElement('div');
+            newEntry.className = 'condition-entry';
+            newEntry.innerHTML = `
+                <button type="button" class="remove-btn" onclick="removeCondicion(this)"><i class="fas fa-times"></i></button>
+                <div class="form-group">
+                    <label for="enfermedad${newIndex}">Enfermedad o Condición</label>
+                    <input type="text" id="enfermedad${newIndex}" placeholder="Nombre de la condición médica">
+                </div>
+                <div class="form-group">
+                    <label for="tiempo${newIndex}">Tiempo con la condición (años)</label>
+                    <input type="number" id="tiempo${newIndex}" placeholder="Años">
+                </div>
+                <div class="form-group">
+                    <label for="medicacion${newIndex}">Medicación Actual</label>
+                    <input type="text" id="medicacion${newIndex}" placeholder="Medicamentos que toma actualmente">
+                </div>
+            `;
+            
+            container.appendChild(newEntry);
+        }
+
+        function removeCondicion(button) {
+            const entry = button.parentNode;
+            const container = entry.parentNode;
+            container.removeChild(entry);
+        }
+
+        function addInternamiento() {
+            const container = document.getElementById('internamientosContainer');
+            const newIndex = document.querySelectorAll('.hospitalization-entry').length;
+            
+            const newEntry = document.createElement('div');
+            newEntry.className = 'hospitalization-entry';
+            newEntry.innerHTML = `
+                <button type="button" class="remove-btn" onclick="removeInternamiento(this)"><i class="fas fa-times"></i></button>
+                <div class="form-group">
+                    <label for="fechaInternamiento${newIndex}">Fecha de Internamiento</label>
+                    <input type="date" id="fechaInternamiento${newIndex}">
+                </div>
+                <div class="form-group">
+                    <label for="centroMedico${newIndex}">Centro Médico</label>
+                    <input type="text" id="centroMedico${newIndex}" placeholder="Nombre del hospital o clínica">
+                </div>
+                <div class="form-group">
+                    <label for="diagnostico${newIndex}">Diagnóstico</label>
+                    <input type="text" id="diagnostico${newIndex}" placeholder="Diagnóstico recibido">
+                </div>
+                <div class="form-group">
+                    <label for="duracion${newIndex}">Duración (días)</label>
+                    <input type="number" id="duracion${newIndex}" placeholder="Número de días">
+                </div>
+            `;
+            
+            container.appendChild(newEntry);
+        }
+
+        function removeInternamiento(button) {
+            const entry = button.parentNode;
+            const container = entry.parentNode;
+            container.removeChild(entry);
+        }
+
+        function generateSummary() {
+            // Guardar datos actualizados de todas las páginas
+            saveCurrentPageData();
+            
+            const nombre = document.getElementById('nombre').value;
+            const apellido = document.getElementById('apellido').value;
+            const fechaNacimiento = document.getElementById('fechaNacimiento').value;
+            const genero = document.getElementById('genero').value;
+            
+            let summaryHTML = `
+                <div class="summary-section">
+                    <h3>Datos Personales</h3>
+                    <div class="summary-data">
+                        <div class="summary-item"><strong>Nombre:</strong> ${nombre || 'No especificado'}</div>
+                        <div class="summary-item"><strong>Apellido:</strong> ${apellido || 'No especificado'}</div>
+                        <div class="summary-item"><strong>Fecha de Nacimiento:</strong> ${fechaNacimiento || 'No especificado'}</div>
+                        <div class="summary-item"><strong>Género:</strong> ${genero || 'No especificado'}</div>
+                    </div>
+                </div>
+            `;
+            
+            // Familiares
+            summaryHTML += `
+                <div class="summary-section">
+                    <h3>Información Familiar</h3>
+`;
+            
+            if (familiares.length === 0 || (familiares.length === 1 && !familiares[0].nombreFamiliar)) {
+                summaryHTML += `<p>No se ha agregado información familiar.</p>`;
+            } else {
+                summaryHTML += `<div class="summary-data">`;
+                familiares.forEach((familiar, index) => {
+                    if (familiar.nombreFamiliar) {
+                        summaryHTML += `
+                            <div class="summary-item"><strong>Familiar ${index + 1}:</strong> ${familiar.nombreFamiliar}</div>
+                            <div class="summary-item"><strong>Parentesco:</strong> ${familiar.parentesco || 'No especificado'}</div>
+                            <div class="summary-item"><strong>Edad:</strong> ${familiar.edadFamiliar || 'No especificado'}</div>
+                        `;
+                    }
+                });
+                summaryHTML += `</div>`;
+            }
+            
+            summaryHTML += `</div>`;
+            
+            // Condiciones
+            summaryHTML += `
+                <div class="summary-section">
+                    <h3>Condiciones Médicas</h3>
+            `;
+            
+            if (condiciones.length === 0 || (condiciones.length === 1 && !condiciones[0].enfermedad)) {
+                summaryHTML += `<p>No se ha agregado información sobre condiciones médicas.</p>`;
+            } else {
+                summaryHTML += `<div class="summary-data">`;
+                condiciones.forEach((condicion, index) => {
+                    if (condicion.enfermedad) {
+                        summaryHTML += `
+                            <div class="summary-item"><strong>Condición ${index + 1}:</strong> ${condicion.enfermedad}</div>
+                            <div class="summary-item"><strong>Tiempo:</strong> ${condicion.tiempo || 'No especificado'} años</div>
+                            <div class="summary-item"><strong>Medicación:</strong> ${condicion.medicacion || 'No especificado'}</div>
+                        `;
+                    }
+                });
+                summaryHTML += `</div>`;
+            }
+            
+            summaryHTML += `</div>`;
+            
+            // Internamientos
+            summaryHTML += `
+                <div class="summary-section">
+                    <h3>Internamientos Previos</h3>
+            `;
+            
+            if (internamientos.length === 0 || (internamientos.length === 1 && !internamientos[0].fechaInternamiento)) {
+                summaryHTML += `<p>No se ha agregado información sobre internamientos previos.</p>`;
+            } else {
+                summaryHTML += `<div class="summary-data">`;
+                internamientos.forEach((internamiento, index) => {
+                    if (internamiento.fechaInternamiento || internamiento.centroMedico) {
+                        summaryHTML += `
+                            <div class="summary-item"><strong>Internamiento ${index + 1}:</strong> ${internamiento.fechaInternamiento || 'Fecha no especificada'}</div>
+                            <div class="summary-item"><strong>Centro Médico:</strong> ${internamiento.centroMedico || 'No especificado'}</div>
+                            <div class="summary-item"><strong>Diagnóstico:</strong> ${internamiento.diagnostico || 'No especificado'}</div>
+                            <div class="summary-item"><strong>Duración:</strong> ${internamiento.duracion || 'No especificado'} días</div>
+                        `;
+                    }
+                });
+                summaryHTML += `</div>`;
+            }
+            
+            summaryHTML += `</div>`;
+            
+            document.getElementById('summaryContainer').innerHTML = summaryHTML;
+        }
+
+        function submitForm() {
+            // Aquí iría el código para enviar los datos a un servidor
+            alert('Registro médico guardado con éxito.');
+        }
+
+        function newPatient() {
+            // Reiniciar el formulario
+            document.getElementById('multiPageForm').reset();
+            
+            // Reiniciar las colecciones
+            familiares = [{
+                nombreFamiliar: '',
+                parentesco: '',
+                edadFamiliar: ''
+            }];
+            
+            condiciones = [{
+                enfermedad: '',
+                tiempo: '',
+                medicacion: ''
+            }];
+            
+            internamientos = [{
+                fechaInternamiento: '',
+                centroMedico: '',
+                diagnostico: '',
+                duracion: ''
+            }];
+            
+            // Reiniciar contenedores
+            document.getElementById('familiaresContainer').innerHTML = `
+                <div class="family-entry">
+                    <div class="form-group">
+                        <label for="nombreFamiliar">Nombre del Familiar</label>
+                        <input type="text" id="nombreFamiliar" placeholder="Nombre completo">
+                    </div>
+                    <div class="form-group">
+                        <label for="parentesco">Parentesco</label>
+                        <select id="parentesco">
+                            <option value="">Seleccione una opción</option>
+                            <option value="padre">Padre</option>
+                            <option value="madre">Madre</option>
+                            <option value="hijo">Hijo/a</option>
+                            <option value="hermano">Hermano/a</option>
+                            <option value="conyuge">Cónyuge</option>
+                            <option value="otro">Otro</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edadFamiliar">Edad</label>
+                        <input type="number" id="edadFamiliar" placeholder="Edad">
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('condicionesContainer').innerHTML = `
+                <div class="condition-entry">
+                    <div class="form-group">
+                        <label for="enfermedad">Enfermedad o Condición</label>
+                        <input type="text" id="enfermedad" placeholder="Nombre de la condición médica">
+                    </div>
+                    <div class="form-group">
+                        <label for="tiempo">Tiempo con la condición (años)</label>
+                        <input type="number" id="tiempo" placeholder="Años">
+                    </div>
+                    <div class="form-group">
+                        <label for="medicacion">Medicación Actual</label>
+                        <input type="text" id="medicacion" placeholder="Medicamentos que toma actualmente">
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('internamientosContainer').innerHTML = `
+                <div class="hospitalization-entry">
+                    <div class="form-group">
+                        <label for="fechaInternamiento">Fecha de Internamiento</label>
+                        <input type="date" id="fechaInternamiento">
+                    </div>
+                    <div class="form-group">
+                        <label for="centroMedico">Centro Médico</label>
+                        <input type="text" id="centroMedico" placeholder="Nombre del hospital o clínica">
+                    </div>
+                    <div class="form-group">
+                        <label for="diagnostico">Diagnóstico</label>
+                        <input type="text" id="diagnostico" placeholder="Diagnóstico recibido">
+                    </div>
+                    <div class="form-group">
+                        <label for="duracion">Duración (días)</label>
+                        <input type="number" id="duracion" placeholder="Número de días">
+                    </div>
+                </div>
+            `;
+            
+            // Volver a la primera página
+            goToPage(1);
+            
+            alert('Formulario reiniciado para un nuevo paciente.');
+        }
+    </script>
+</body>
+</html>

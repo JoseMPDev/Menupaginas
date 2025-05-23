@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validador de Cédula Dominicana</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Validador de Cédula Dominicana</h1>
+        
+        <div class="form-group">
+            <label for="cedula">Ingrese el número de cédula:</label>
+            <input type="text" id="cedula" placeholder="Ejemplo: 00116454281" maxlength="11">
+        </div>
+        
+        <button onclick="validarCedula()">Validar</button>
+        
+        <div id="result" class="result"></div>
+        
+        <div class="instructions">
+            <h3>Información:</h3>
+            <p>Este validador verifica si una cédula dominicana es válida según el algoritmo de Luhn. La cédula dominicana consta de 11 dígitos.</p>
+            <p>Formato: XXX-XXXXXXX-X (se puede ingresar con o sin guiones)</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

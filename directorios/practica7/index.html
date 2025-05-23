@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario de Contacto con QR</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .form-container {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        .form-section {
+            flex: 1;
+            min-width: 300px;
+        }
+        .qr-section {
+            flex: 1;
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button.clear {
+            background-color: #f44336;
+        }
+        .error {
+            color: red;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        #qrcode {
+            margin-top: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .info-text {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #555;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Formulario de Contacto con QR</h1>
+    
+    <div class="form-container">
+        <div class="form-section">
+            <form id="contactForm">
+                <div class="form-group">
+                    <label for="nombre">Nombre*:</label>
+                    <input type="text" id="nombre" name="nombre" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="apellido">Apellido*:</label>
+                    <input type="text" id="apellido" name="apellido" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="telefono">Teléfono*:</label>
+                    <input type="tel" id="telefono" name="telefono" placeholder="809-XXX-XXXX" required>
+                    <div class="error" id="telefonoError">Ingrese un número de teléfono válido para República Dominicana</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Correo electrónico:</label>
+                    <input type="email" id="email" name="email">
+                </div>
+                
+                <div class="form-group">
+                    <label for="empresa">Empresa:</label>
+                    <input type="text" id="empresa" name="empresa">
+                </div>
+                
+                <div class="form-group">
+                    <label for="cargo">Cargo:</label>
+                    <input type="text" id="cargo" name="cargo">
+                </div>
+                
+                <div class="form-group">
+                    <label for="direccion">Dirección:</label>
+                    <input type="text" id="direccion" name="direccion">
+                </div>
+                
+                <button type="button" id="generarButton">Generar QR</button>
+                <button type="button" class="clear" id="limpiarButton">Limpiar</button>
+            </form>
+        </div>
+        
+        <div class="qr-section">
+            <h2>Código QR</h2>
+            <div id="qrcode"></div>
+            <p class="info-text">Escanee el código QR con su teléfono para agregar este contacto.</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const generarButton = document.getElementById('generarButton');
+            const limpiarButton = document.getElementById('limpiarButton');
+            const telefonoInput = document.getElementById('telefono');
+            const telefonoError = document.getElementById('telefonoError');
+            const qrcodeContainer = document.getElementById('qrcode');
+            
+            // Función para validar números de teléfono de República Dominicana
+            function validarTelefonoRD(telefono) {
+                // Eliminar espacios en blanco, guiones y paréntesis
+                const numeroLimpio = telefono.replace(/[\s\-()]/g, '');
+                
+                // Validar que sean 10 dígitos y comience con un código de área válido
+                const regex = /^(809|829|849)\d{7}$/;
+                return regex.test(numeroLimpio);
+            }
+            
+            // Formatear el número telefónico al escribir
+            telefonoInput.addEventListener('input', function() {
+                let numero = this.value.replace(/\D/g, '');
+                
+                if (numero.length > 0) {
+                    // Formatear como: XXX-XXX-XXXX
+                    if (numero.length <= 3) {
+                        this.value = numero;
+                    } else if (numero.length <= 6) {
+                        this.value = numero.slice(0, 3) + '-' + numero.slice(3);
+                    } else {
+                        this.value = numero.slice(0, 3) + '-' + numero.slice(3, 6) + '-' + numero.slice(6, 10);
+                    }
+                }
+                
+                // Validar prefijo de RD mientras se escribe
+                if (numero.length >= 3) {
+                    const prefijo = numero.slice(0, 3);
+                    if (prefijo !== '809' && prefijo !== '829' && prefijo !== '849') {
+                        telefonoError.style.display = 'block';
+                    } else {
+                        telefonoError.style.display = 'none';
+                    }
+                }
+            });
+            
+            // Generar QR
+            generarButton.addEventListener('click', function() {
+                const nombre = document.getElementById('nombre').value;
+                const apellido = document.getElementById('apellido').value;
+                const telefono = document.getElementById('telefono').value;
+                const email = document.getElementById('email').value;
+                const empresa = document.getElementById('empresa').value;
+                const cargo = document.getElementById('cargo').value;
+                const direccion = document.getElementById('direccion').value;
+                
+                // Validar campos requeridos
+                if (!nombre || !apellido || !telefono) {
+                    alert('Por favor complete los campos obligatorios: Nombre, Apellido y Teléfono');
+                    return;
+                }
+                
+                // Validar formato de teléfono para República Dominicana
+                if (!validarTelefonoRD(telefono)) {
+                    telefonoError.style.display = 'block';
+                    return;
+                }
+                
+                // Limpiar QR anterior
+                qrcodeContainer.innerHTML = '';
+                
+                // Crear contenido vCard
+                const numeroLimpio = telefono.replace(/[\s\-()]/g, '');
+                let vCard = `BEGIN:VCARD
+VERSION:3.0
+N:${apellido};${nombre};;;
+FN:${nombre} ${apellido}
+TEL;TYPE=CELL:${numeroLimpio}`;
+                
+                if (email) vCard += `\nEMAIL:${email}`;
+                if (empresa) vCard += `\nORG:${empresa}`;
+                if (cargo) vCard += `\nTITLE:${cargo}`;
+                if (direccion) vCard += `\nADR:;;${direccion};;;;`;
+                
+                vCard += `\nEND:VCARD`;
+                
+                // Generar código QR
+                new QRCode(qrcodeContainer, {
+                    text: vCard,
+                    width: 200,
+                    height: 200,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            });
+            
+            // Limpiar formulario
+            limpiarButton.addEventListener('click', function() {
+                document.getElementById('contactForm').reset();
+                qrcodeContainer.innerHTML = '';
+                telefonoError.style.display = 'none';
+            });
+        });
+    </script>
+</body>
+</html>
